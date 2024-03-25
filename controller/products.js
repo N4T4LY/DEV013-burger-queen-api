@@ -59,6 +59,32 @@ postProducts: async (req, res) => {
   }
 },
 
+//find product
+getProductById: async (req, res) => {
+  try {
+    const db = await connect();
+    const collection = db.collection("product");
+    const { productId } = req.params;
+    if (!ObjectId.isValid(productId)) {
+      return res.status(400).json({ error: "ID de producto inválido" });
+    }
+    const cursor = await collection
+      .find({ _id:new ObjectId(productId) })
+      .toArray();
+    if (cursor.length === 0) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+    console.log("🚀 ~ app.get ~ cursor:", cursor);
+    res.json(cursor);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+},
+
+
+
+
 
 };
 
