@@ -116,6 +116,25 @@ putProductById: async (req, res) => {
   }
 },
 
+deleteProduct: async (req, res) => {
+  try {
+    const db = await connect();
+    const collection = db.collection("product");
+    
+    const {productId}=req.params;
+    const cursor = await collection.deleteOne({_id:new ObjectId(productId)});
+    if (cursor.deletedCount === 0) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+    console.log("🚀 ~ app.get ~ cursor:", cursor)
+    res.json({ msg: "Producto eliminado correctamente" });
+  } catch (error) {
+    
+    console.error("Error al eliminar el producto:", error);
+  res.status(500).json({ error: "Error en el servidor al eliminar el producto" });
+  }
+},
+
 
 
 };
