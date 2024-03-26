@@ -71,6 +71,26 @@ module.exports = {
 
    //set user
    putUser: async(req,res,next)=>{
+    try{
+      const db = await connect();
+           
+      const collection = db.collection("user");
+      const { email,password,role } = req.body;
+      const {userId}=req.params;
+      const saltRounds =10;
+      const salt = await bcrypt.genSalt(saltRounds);
+      const hashedPassword=await bcrypt.hash(password,salt);
+      const cursor = await collection.updateOne({_id:new ObjectId(userId)},{$set:{
+        email:email,
+        password:hashedPassword,
+        role:role
+      }})
+      res.json(cursor)
+    }catch(error){
+    console.log("🚀 ~ app.put ~ error:", error)
+
+    }
+
 
    }
 
