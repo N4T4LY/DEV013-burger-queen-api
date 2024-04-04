@@ -83,6 +83,61 @@ module.exports = {
     }
   },
 
+  //insert user
+  postUsers: async (req, res) => {
+    try {
+      const db = await connect();
+      const collection = db.collection("user");
+      const { email, password, role } = req.body;
+
+      if (!email && !password) {
+        return res
+          .status(400)
+          .json({ error: "email and password are missing" });
+      }
+      if (!email || !password) {
+        return res.status(400).json({ error: "email or password are missing" });
+      }
+
+      if (!validarEmail(email)) {
+        return res.status(400).json({ error: "email invalid" });
+      }
+
+      if (password.length < 3) {
+        return res.status(400).json({ error: "password invalid" });
+      }
+
+      const saltRounds = 10;
+      const salt = await bcrypt.genSalt(saltRounds);
+      console.log("salt", salt);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      console.log("salt", hashedPassword);
+      //const { userId } = req.params;
+      const userFinded = await collection.findOne({ email: email });
+      console.log("userfinded", userFinded);
+      if (userFinded) {
+        return res.status(403).json({ error: "the user is already in DB" });
+      } else {
+        const cursor = await collection.insertOne({
+          email: email,
+          password: hashedPassword,
+          role: role,
+        });
+        const insertedUser = {
+          _id: cursor.insertedId,
+          email: email,
+          role: role,
+        };
+        res.json(insertedUser);
+      }
+    } catch (error) {
+      console.log("🚀 ~ postUsers: ~ error:", error);
+      res
+        .status(500)
+        .json({ error: "Server error getting users" });
+    }
+  },
+
  
 };
 
