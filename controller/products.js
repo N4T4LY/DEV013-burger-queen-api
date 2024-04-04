@@ -79,6 +79,35 @@ module.exports = {
     }
   },
 
+   // Encontrar producto por ID
+   getProductById: async (req, res) => {
+    try {
+      const db = await connect();
+      const collection = db.collection("product");
+      const { productId } = req.params;
+
+      // Validar formato de ID de producto
+      if (!ObjectId.isValid(productId)) {
+        return res.status(400).json({ error: "ID invalid" });
+      }
+
+      // Buscar el producto con el ID dado
+      const product = await collection.findOne({ _id: new ObjectId(productId) });
+
+      // Si el producto no existe, devolver 404
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      // Devolver el producto al usuario
+      res.json(product);
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "there was an error on the server" });
+    }
+  },
+
+
  
 
 
