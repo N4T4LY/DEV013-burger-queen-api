@@ -101,20 +101,13 @@ const initAdminUser = async (app, next) => {
 
 module.exports = (app, next) => {
 
-  app.get('/users', requireAdmin, getUsers);
+  app.get('/users',requireAdmin , getUsers);
+  app.delete('/users/:userId',requireAuth, deleteUserById);
+  app.get('/users/:userId', requireAuth,getUserById);
+  app.post('/users', requireAdmin,postUsers);
+  app.put('/users/:userId', requireAuth, putUser);
 
-  app.get('/users/:uid', requireAuth, (req, resp) => {
-  });
+ 
 
-  app.post('/users', requireAdmin, (req, resp, next) => {
-    // TODO: Implement the route to add new users
-  });
-
-  app.put('/users/:uid', requireAuth, (req, resp, next) => {
-  });
-
-  app.delete('/users/:uid', requireAuth, (req, resp, next) => {
-  });
-
-  initAdminUser(app, next);
+   initAdminUser(app, next);
 };
