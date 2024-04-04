@@ -219,6 +219,47 @@ module.exports = {
     }
   },
 
+  //delete user
+  deleteUserById: async (req, res, next) => {
+    try {
+      const db = await connect();
+      const collection = db.collection("user");
+      const { userId } = req.params;
+
+      const isEmail = validarEmail(userId);
+      const isValidObjectId = ObjectId.isValid(userId);
+      let user;
+
+      if (isEmail) {
+        user = await collection.findOne({ email: userId });
+      } else if (isValidObjectId) {
+        user = await collection.findOne({ _id: new ObjectId(userId) });
+      } else {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      if (!user) {
+        return res.status(404).json({ msg: "User not found" });
+      }
+
+      const loggedInUserId = req.uid.toString();
+
+      // Verificar si el usuario que realiza la solicitud es el propietario o un administrador
+      if (user._id.toString() !== loggedInUserId && !isAdmin(req)) {
+        return res
+          .status(403)
+          .json({ error: "You are not authorized to delete this user" });
+      }
+
+      const cursor = await collection.deleteOne({ _id: user._id });
+      res.json({ msg: "User deleted successfully" });
+    } catch (error) {
+      console.log("Error in deleteUserById:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+      next(error);
+    }
+  },
+
  
 };
 
