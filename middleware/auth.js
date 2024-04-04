@@ -32,7 +32,8 @@ module.exports = (secret) => (req, resp, next) => {
 
 module.exports.isAuthenticated = (req) => (
   // TODO: Decide based on the request information whether the user is authenticated
-  false
+  !!req.uid
+  
 );
 
 module.exports.isAdmin = (req) => (
