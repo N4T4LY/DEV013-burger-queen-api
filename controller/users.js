@@ -138,6 +138,87 @@ module.exports = {
     }
   },
 
+  
+  //set user
+  putUser: async (req, res, next) => {
+    try {
+      const db = await connect();
+      const collection = db.collection("user");
+      const { email, password, role } = req.body;
+      const { userId } = req.params;
+
+      
+
+      const isEmail = validarEmail(userId);
+      const isValidObjectId = ObjectId.isValid(userId);
+
+      let user;
+      if (isEmail) {
+        user = await collection.findOne({ email: userId });
+      } else if (isValidObjectId) {
+        user = await collection.findOne({ _id: new ObjectId(userId) });
+      } else {
+        return res.status(400).json({ error: "Invalid user" });
+      }
+
+
+      
+
+      if (!user) {
+        return res.status(404).json({ msg: "User not found" });
+      }
+
+      const loggedInUserId = req.uid.toString();
+      const requestedUserId = user._id.toString();
+
+      if (!isAdmin(req) && requestedUserId !== loggedInUserId) {
+        return res.status(403).json({
+          error: "You are not authorized to change this information",
+        });
+      }
+      
+
+      if (!email && !password && !role) {
+        return res.status(400).json({ error: "No props to update" });
+      }
+
+      
+
+     
+
+      const updates = {};
+      if (email) updates.email = email;
+      if (password) {
+        const saltRounds = 10;
+        const salt = await bcrypt.genSalt(saltRounds);
+        updates.password = await bcrypt.hash(password, salt);
+      }
+
+      // Validate admin role change
+      if (
+        requestedUserId === loggedInUserId &&
+        role === "admin" &&
+        !isAdmin(req)
+      ) {
+        return res.status(403).json({
+          error: "You are not authorized to change your own role to admin",
+        });
+      } 
+
+      if (Object.keys(updates).length > 0) {
+        const cursor = await collection.updateOne(
+          { _id: user._id },
+          { $set: updates }
+        );
+        res.json(cursor);
+      } else {
+        res.json({ msg: "No updates made" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+
  
 };
 
