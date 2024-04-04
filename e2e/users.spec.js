@@ -38,7 +38,7 @@ describe('GET /users', () => {
         expect(resp.status).toBe(200);
         return resp.json();
       })
-      .then(({ json }) => {
+      .then(( json ) => {
         expect(Array.isArray(json)).toBe(true);
         expect(json.length).toBe(1);
         expect(json[0]).toHaveProperty('_id');
@@ -203,7 +203,7 @@ describe('PUT /users/:uid', () => {
         expect(resp.status).toBe(200);
         return resp.json();
       })
-      .then((json) => expect(json).toHaveProperty('token'))
+      .then((json) => expect(json).toHaveProperty('accessToken'))
   ));
 
   it('should update user when admin', () => (
@@ -220,7 +220,7 @@ describe('PUT /users/:uid', () => {
         expect(resp.status).toBe(200);
         return resp.json();
       })
-      .then((json) => expect(json).toHaveProperty('token'))
+      .then((json) => expect(json).toHaveProperty('accessToken'))
   ));
 });
 
@@ -249,7 +249,7 @@ describe('DELETE /users/:uid', () => {
         expect(resp.status).toBe(200);
         return resp.json();
       })
-      .then(({ token }) => fetchWithAuth(token)(`/users/${credentials.email}`, {
+      .then(({ accessToken }) => fetchWithAuth(accessToken)(`/users/${credentials.email}`, {
         method: 'DELETE',
       }))
       .then((resp) => expect(resp.status).toBe(200))
