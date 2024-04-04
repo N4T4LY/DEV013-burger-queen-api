@@ -15,7 +15,15 @@ module.exports = (secret) => (req, resp, next) => {
 
   jwt.verify(token, secret, (err, decodedToken) => {
     if (err) {
+      console.log("TOKEN",token);
+      console.log("secret",secret);
       return next(403);
+    }else{
+      console.log("decodedToken",decodedToken);
+      req.isAdmin=decodedToken.role==='admin';
+      console.log("isadmin: ",req.isAdmin);
+      req.uid=decodedToken._id;
+      next();
     }
 
     // TODO: Verify user identity using `decodeToken.uid`
