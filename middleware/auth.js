@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 
 module.exports = (secret) => (req, resp, next) => {
   const { authorization } = req.headers;
-
+  console.log("authorization",authorization);
+  
   if (!authorization) {
     return next();
   }
@@ -27,6 +28,7 @@ module.exports = (secret) => (req, resp, next) => {
     }
 
     // TODO: Verify user identity using `decodeToken.uid`
+
   });
 };
 
@@ -38,7 +40,7 @@ module.exports.isAuthenticated = (req) => (
 
 module.exports.isAdmin = (req) => (
   // TODO: Decide based on the request information whether the user is an admin
-  false
+ req.isAdmin
 );
 
 module.exports.requireAuth = (req, resp, next) => (
