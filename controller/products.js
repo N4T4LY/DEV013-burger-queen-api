@@ -107,6 +107,58 @@ module.exports = {
     }
   },
 
+  putProductById: async (req, res) => {
+    try {
+      const db = await connect();
+      const collection = db.collection("product");
+      const { productId } = req.params;
+
+      if (!ObjectId.isValid(productId)) {
+        return res.status(400).json({ error: "ID invalid" });
+      }
+
+      // Verificar si el usuario es administrador
+      const admin = isAdmin(req);
+      if (!admin) {
+        return res.status(403).json({ error: "You are not authorized to do this" });
+      }
+
+      const { name, price, image, type } = req.body;
+
+      // Buscar el producto con el ID dado
+      const product = await collection.findOne({ _id: new ObjectId(productId) });
+
+      // Verificar si el producto no existe
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      // Validar campos requeridos
+      if (!name || !price || !image || !type) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+
+      // Validar precio (número y positivo)
+      if (typeof price !== 'number' || price <= 0) {
+        return res.status(400).json({ error: "The price must be a positive number" });
+      }
+
+      const cursor = await collection.updateOne(
+        { _id: ObjectId(productId) },
+        { $set: { name, price, image, type } }
+      );
+
+      if (!cursor.modifiedCount) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      res.json({ msg: "Successfully updated product" });
+    } catch (error) {
+      
+      res.status(500).json({ error: "there was an error on the server" });
+    }
+  },
+
 
  
 
