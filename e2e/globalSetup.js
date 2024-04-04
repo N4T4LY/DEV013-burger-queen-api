@@ -72,7 +72,7 @@ const createTestUser = () => fetchAsAdmin('/users', {
     }
     return resp.json();
   })
-  .then(({ token }) => Object.assign(__e2e, { testUserToken: token }));
+  .then(({ accessToken }) => Object.assign(__e2e, { testUserToken: accessToken }));
 
 const checkAdminCredentials = () => fetch('/login', {
   method: 'POST',
@@ -85,7 +85,7 @@ const checkAdminCredentials = () => fetch('/login', {
 
     return resp.json();
   })
-  .then(({ token }) => Object.assign(__e2e, { adminToken: token }));
+  .then(({ accessToken }) => Object.assign(__e2e, { adminToken: accessToken }));
 
 const waitForServerToBeReady = (retries = 10) => new Promise((resolve, reject) => {
   if (!retries) {
@@ -117,7 +117,7 @@ module.exports = () => new Promise((resolve, reject) => {
       {
         cwd: path.resolve(__dirname, "../"),
         stdio: ["ignore", "pipe", "pipe"],
-        env: { PATH: process.env.PATH, MONGO_URL: process.env.MONGO_URL }
+        env: { PATH: process.env.PATH, MONGO_URL:  process.env.MONGO_URL }
       }
     );
 
