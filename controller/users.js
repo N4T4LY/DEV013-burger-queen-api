@@ -29,6 +29,60 @@ module.exports = {
         .json({ error: "Error en el servidor al obtener los usuarios" });
     }
   },
+
+  //find user
+  getUserById: async (req, res) => {
+    try {
+      const db = await connect();
+      const collection = db.collection("user");
+      const { userId } = req.params;
+
+    
+      const isEmail = validarEmail(userId);
+      const isValidObjectId = ObjectId.isValid(userId);
+
+      let user;
+      if (isEmail) {
+        user = await collection.findOne({ email: userId });
+      } else if (isValidObjectId) {
+        user = await collection.findOne({ _id: new ObjectId(userId) });
+      } else {
+        return res.status(400).json({ error: "Invalid user" });
+      }
+      // const loggedInUserId = req.uid.toString();
+      // const isAdmin = req.role === "admin";
+
+      // if (!isAdmin && uid !== loggedInUserId || uid !== req.email) {
+      //   return res
+      //     .status(403)
+      //     .json({ error: "You are not authorized to access this user" });
+      // }
+
+      if (!user) {
+        return res.status(404).json({ msg: "User not found" });
+      }
+
+      
+
+      const isAdmin = req.isAdmin;
+      const loggedInUserId = req.uid;
+
+      console.log("isAdmin:", isAdmin);
+      console.log("loggedInUserId:", loggedInUserId);
+      console.log("requestedUserId:", user._id.toString());
+
+      if (user._id.toString() !== loggedInUserId && !isAdmin) {
+        return res
+          .status(403)
+          .json({ error: "You are not authorized to access this user" });
+      }
+
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+
  
 };
 
