@@ -11,7 +11,7 @@ const {
 const { Collection } = require('mongodb');
 const { connect } = require('../connect');
 
-const initAdminUser = (app, next) => {
+const initAdminUser = async (app, next) => {
   const { adminEmail, adminPassword } = app.get('config');
   if (!adminEmail || !adminPassword) {
     return next();
@@ -20,10 +20,24 @@ const initAdminUser = (app, next) => {
   const adminUser = {
     email: adminEmail,
     password: bcrypt.hashSync(adminPassword, 10),
-    roles: "admin",
+    role: "admin",
   };
 
+  const db= await connect()
+    const collection = db.collection("user");
+    const existingAdmin= await collection.findOne({
+    email:adminUser.email,
+    })
+    console.log(adminUser.email)
+
+    if(!existingAdmin){
+      const insertAdmin = await collection.insertOne(adminUser);
+      console.log(adminUser.email)
+    }
+
+
   // TODO: Create admin user
+  
   // First, check if adminUser already exists in the database
   // If it doesn't exist, it needs to be saved
 
