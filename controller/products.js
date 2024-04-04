@@ -159,8 +159,39 @@ module.exports = {
     }
   },
 
+// Eliminar producto por ID
+deleteProduct: async (req, res) => {
+  try {
+    // Verificar si el usuario es administrador
+    const isAdmin = req.user.isAdmin;
+    if (!isAdmin) {
+      return res.status(403).json({ error: "You are not authorized to do this" });
+    }
 
- 
+    // Conectar a la base de datos
+    const db = await connect();
+    const collection = db.collection("product");
 
+    const { productId } = req.params;
 
+    // Validar formato de ID de producto
+    if (!ObjectId.isValid(productId)) {
+      return res.status(400).json({ error: "ID invalid" });
+    }
+
+    // Eliminar el producto
+    const cursor = await collection.deleteOne({ _id: new ObjectId(productId) });
+
+    // Verificar si el producto no fue encontrado
+    if (!cursor) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Producto eliminado exitosamente
+    res.json({ msg: "Successfully deleted product" });
+  } catch (error) {
+  
+    res.status(500).json({ error: "You are not authorized to do this" });
+  }
+}
 };
