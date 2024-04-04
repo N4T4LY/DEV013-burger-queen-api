@@ -8,6 +8,8 @@ const {
 const {
   getUsers,deleteUserById,getUserById, postUsers,putUser
 } = require('../controller/users'); require('../controller/users');
+const { Collection } = require('mongodb');
+const { connect } = require('../connect');
 
 const initAdminUser = (app, next) => {
   const { adminEmail, adminPassword } = app.get('config');
