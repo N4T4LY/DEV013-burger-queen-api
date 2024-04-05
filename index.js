@@ -34,4 +34,4 @@ routes(app, (err) => {
 
 });
 
-module.exports = app;
+//module.exports = app;
