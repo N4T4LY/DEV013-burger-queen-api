@@ -30,4 +30,6 @@ routes(app, (err) => {
   app.listen(port, () => {
     console.info(`App listening on port ${port}`);
   });
+
+  module.exports = app;
 });
