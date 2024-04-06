@@ -129,11 +129,6 @@ module.exports = {
         return res.status(404).json({ error: "Product not found" });
       }
   
-      if (!product) {
-        // Si no se encuentra el producto, devuelve 404
-        return res.status(404).json({ error: "Product not found" });
-      }
-  
       const { price } = req.body;
   
       // Si el precio se proporciona en el cuerpo de la solicitud, actualizar el producto
